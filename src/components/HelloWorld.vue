@@ -12,6 +12,13 @@
 <script>
 export default {
   name: 'HelloWorld',
+  watch: {
+    "$route"(){
+        if (/iPhone|mac|iPod|iPad/i.test(navigator.userAgent)) {
+          location.href = 'localhost:8081/mob/#' + this.$route.path
+        }
+    },
+  },
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
