@@ -15,3 +15,11 @@ export const getTicketwhileList = params => post('/Business/while_list', params)
 export const getTicketFinance = params => post('/Business/finance', params) // 商票秒融首页提交试算/开始计算
 
 export const getTicketBankLists = params => post('/Business/lists', params) // 获取商票秒融首页列表
+
+export const getTicketCommercialPaperList = params => post('/business/commercialPaperList', params) // 获取商票秒融票据列表
+
+export const getTicketOperateCommercialPaper = params => post('/business/operateCommercialPaper', params) // 获取商票秒融新增/修改票据
+
+export const ticketShowCommercialPaperInfo = params => post('/business/showCommercialPaperInfo', params) // 获取商票秒融新增/修改票据
+
+export const ticketoperateCommercialPaper = params => post('/business/operateCommercialPaper', params) // 获取商票秒融新增/修改票据

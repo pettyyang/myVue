@@ -1,11 +1,11 @@
 <template>
-    <el-container class="page-full-Home page-news">
+    <el-container class="page-full-Home page-news" v-loading="isloading">
         <the-header :show-right="true"></the-header>
         <el-main style="width: 1280px;overflow-x: hidden;" class="main-wrapper">
             <el-breadcrumb class="bread-wrapper" separator="/">
                 <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/' }">商票秒融</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/' }">上海银行</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{ path: '/commercial-ticket' }">商票秒融</el-breadcrumb-item>
+                <el-breadcrumb-item>添加</el-breadcrumb-item>
             </el-breadcrumb>
 
             <div class="container-wrapper">
@@ -14,15 +14,30 @@
                 <div class="price-content">
                   <el-row>
                     <el-col :span="12">
-                      <div class="price-content">
+                      <div class="price-content" v-loading="isIdentifyOk">
                         <!-- 上传图片模块 -->
                         <div class="upload-img">
-                          <theUploadPic @getImg="getNoteMsg"></theUploadPic>
+                          <theUploadPic @getFile="getNoteMsg">
+                            <template v-slot:picture v-if="originUrl">
+                              <div class="same-legal-img-font">
+                                <img @mouseenter="isDeleteFont = true" :src="originUrl" />
+                              </div>
+                              <div class="same-legal-pic-mask" @mouseenter="isDeleteFont = true" @mouseleave="isDeleteFont = false" v-if="isDeleteFont">
+                                <i
+                                  @click="
+                                    originUrl = ''; isDeleteFont=false
+                                  "
+                                  class="el-icon-delete"
+                                ></i>
+                              </div>
+                            </template>
+                          </theUploadPic>
                           <div class="upimg-style">
                             <div class="upimg-body">
                               <img src="@/assets/img/bth_common_add.png" />
                               <p style="color:#3688FF;font-size:18px;margin-top:40px;">请上传票据正面截图</p>
-                              <p style="color:#999;">图片文件（.png.jpg.jpeg）5M以内</p>
+                              <p style="color:#999;margin-bottom:4px;">图片文件（.png.jpg.jpeg）5M以内</p>
+                              <p style="color:#999;">（识别成功之后信息将自动显示）</p>
                             </div>
                           </div>
                         </div>
@@ -33,18 +48,31 @@
                           <!-- 表单模块 -->
                         <div class="form-container">
                           <div class="ipt">
+                            <p class="ipt-tips">
+                              <i class="el-icon-warning tips-warning"></i>
+                              <span>温馨提示: *号信息为必填，其他信息选填，若存在背书，请按照网银中背书记录填写。</span>
+                            </p>
+                          </div>
+                          <div class="ipt">
+                            <div class="bank">
+                              <img src="@/assets/img/start.png" />
+                              <span>票据号码</span>
+                            </div>
+                            <el-input placeholder="请输入票号" v-model="dataBilInfo.billNo" class="elinput"></el-input>
+                          </div>
+                          <div class="ipt">
                             <div class="bank">
                               <img src="@/assets/img/start.png" />
                               <span>承兑名称</span>
                             </div>
-                            <el-input placeholder="请输入承兑行名称" v-model="dataBilInfo.bankName" style="width: 260px;" class="elinput"></el-input>
+                            <el-input placeholder="请输入承兑行名称" v-model="dataBilInfo.accepterName" class="elinput"></el-input>
                           </div>
                           <div class="ipt">
                             <div class="bank">
                               <img src="@/assets/img/start.png" />
                               <span>票面金额</span>
                             </div>
-                            <el-input placeholder="请输入票面金额" v-model="dataBilInfo.amt" style="width: 260px;" class="elinput fixed-text">
+                            <el-input placeholder="请输入票面金额" v-model="dataBilInfo.amt" class="elinput fixed-text">
                               <span slot="suffix">万元</span>
                             </el-input>
                           </div>
@@ -54,13 +82,13 @@
                               <span>到期日期</span>
                             </div>
                             <div class="date-picker">
-                              <el-date-picker class="elinput datePickerIpt" v-model="dataBilInfo.expiryDate" value-format="yyyy-MM-dd" type="date" :editable="false" align="right" placeholder="选择日期"></el-date-picker>
+                              <el-date-picker class="elinput datePickerIpt" v-model="dataBilInfo.maturityDate" value-format="yyyy-MM-dd" type="date" :editable="false" align="right" placeholder="选择日期"></el-date-picker>
                               <img src="@/assets/img/ic_sj_rq.png" />
                             </div>
 
                             <!-- <el-input suffix-icon="el-icon-date" v-model='remitDate' class="elinput"></el-input> -->
                           </div>
-                          <el-button :loading="isEnquirySuccess" class="start-btn" :disabled="isCanEnquiry" type="primary">开始计算</el-button>
+                          <el-button :loading="isEnquirySuccess" class="start-btn" :disabled="isCanEnquiry" type="primary" @click="saveCommercial">保存</el-button>
                         </div>
                       </div>
                     </el-col>
@@ -75,6 +103,7 @@
     </el-container>
 </template>
 <script>
+import { getTicketBillinfo, ticketShowCommercialPaperInfo, getTicketOperateCommercialPaper } from '@/api/comTicketApi.js'
 import theHeader from '_c/theHeader'
 import theFooter from '_c/theFooter'
 import theUploadPic from '_c/theUploadPic'
@@ -87,36 +116,104 @@ export default {
   },
   data () {
     return {
-      listData: [], // 公告列表数据
-      tableData: [
-        {
-          by_interest: '测试'
-        }
-      ],
+      isloading: false,
+      isDeleteFont: false,
       dataBilInfo: {
         // 票据信息
-        bankName: '', // 承兑行名称
-        acceptBankNo: '', // 承兑行行号
+        accepterName: '', // 承兑人名称
         amt: '', // 票面金额
-        expiryDate: '', // 汇票到期日
-        draftNo: '' // 票号
+        maturityDate: '', // 汇票到期日
+        billNo: '', // 票号
+        finance_type: '2', // 融资类型
+        bank_no: '' // 承兑行行号
       },
-      value: '',
+      ticketId: '', // 票据id
+      originUrl: '', // 票据url地址
+      isIdentifyOk: false,
       isEnquirySuccess: false,
-      isCanEnquiry: false
+      isCanEnquiry: true
 
     }
   },
   created () {
+    this.ticketId = this.$route.query
+    this.ticketShowCommercialPaperInfo()
   },
   mounted () {},
   methods: {
-    // 点击申请交易
-    applyTrade () {
-      this.$router.push(this.$routerPath.routerCommercial_perfectinfo)
+    // 获取修改票据时，票据信息
+    ticketShowCommercialPaperInfo () {
+      if (!this.ticketId) return
+      const params = {
+        id: this.ticketId
+      }
+      this.isloading = true
+      try {
+        ticketShowCommercialPaperInfo(params).then(res => {
+          if (res.res === 1) {
+            this.isloading = false
+            this.isCanEnquiry = false
+            this.dataBilInfo.billNo = res.data.draft_no
+            this.dataBilInfo.accepterName = res.data.bank_name
+            this.dataBilInfo.amt = this.$BigNumberCHU(res.data.face_amt, 10000)
+            const maturityDate = res.data.expire_date.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3')
+            this.dataBilInfo.maturityDate = maturityDate
+            this.dataBilInfo.bank_no = res.data.bank_no
+            this.originUrl = res.data.bill_url
+          }
+        })
+      } catch (error) {
+        this.isloading = false
+        console.log(error)
+      }
     },
-    getNoteMsg () {
-
+    // 点击上传票据获取，票据信息
+    getNoteMsg (file, data) {
+      this.isIdentifyOk = true
+      this.originUrl = data.originUrl
+      const jsonData = {
+        filename: data.originUrl
+      }
+      try {
+        getTicketBillinfo(jsonData).then(res => {
+          this.isIdentifyOk = false
+          if (res.res === 1) {
+            this.isCanEnquiry = false
+            this.dataBilInfo.billNo = res.data.billNo
+            this.dataBilInfo.accepterName = res.data.accepterName
+            this.dataBilInfo.amt = this.$BigNumberCHU(res.data.billAmt, 10000)
+            const maturityDate = res.data.maturityDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3')
+            this.dataBilInfo.maturityDate = maturityDate
+            this.dataBilInfo.bank_no = res.data.accepterBank
+          }
+        })
+      } catch (error) {
+        this.isIdentifyOk = false
+        console.log(error)
+      }
+    },
+    // 新增/修改票据，保存事件
+    saveCommercial () {
+      const info = this.dataBilInfo
+      this.isEnquirySuccess = true
+      const params = {
+        id: this.ticketId, // 票据id（修改必填）
+        bill_url: this.originUrl, // 票据url地址
+        bank_name: info.accepterName, // 承兑人
+        finance_type: info.finance_type, // 融资类型
+        bank_no: info.bank_no, // 承兑行行号
+        draft_no: info.billNo, // 票号
+        face_amt: info.amt, // 票面金额
+        expire_date: info.maturityDate // 到期日
+      }
+      try {
+        getTicketOperateCommercialPaper(params).then(res => {
+          this.isEnquirySuccess = false
+        })
+      } catch (error) {
+        this.isEnquirySuccess = false
+        console.log(error)
+      }
     }
   }
 }
@@ -239,11 +336,27 @@ export default {
 /* 表单*/
 .form-container {
   padding-left: 24px;
-  margin-top: 51px;
+  margin-top: 32px;
 }
 .ipt {
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   display: flex;
+}
+.ipt-tips{
+  width: 100%;
+  height: 40px;
+  background: rgba(54, 136, 255, 0.1);
+  font-size: 14px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: #666;
+  line-height: 40px;
+  border: 1px solid #3688FF;
+  .tips-warning{
+    color: #409EFF;
+    margin-left: 13px;
+    margin-right: 7px;
+  }
 }
 .bank {
   display: inline-block;
@@ -268,7 +381,7 @@ export default {
 }
 .elinput {
   /* display: inline-block; */
-  width: 260px;
+  width: 400px;
   height: 40px;
   float: right;
 }
@@ -284,4 +397,12 @@ export default {
   top: 50%;
   transform: translateY(-50%);
 }
+</style>
+<style lang="less">
+  .form-container .fixed-text .el-input__suffix {
+    line-height: 40px;
+    color: #330300;
+    font-size: 14px;
+    margin-right: 12px;
+  }
 </style>

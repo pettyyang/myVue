@@ -1,14 +1,14 @@
 <template>
-    <el-container class="page-full-Home page-news">
+    <el-container class="page-full-Home page-news" v-loading="isloading">
         <the-header :show-right="true"></the-header>
         <el-main style="width: 1280px;overflow-x: hidden;" class="main-wrapper">
             <el-breadcrumb class="bread-wrapper" separator="/">
                 <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/' }">商票秒融</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/' }">上海银行</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{ path: '/commercial-ticket' }">商票秒融</el-breadcrumb-item>
+                <el-breadcrumb-item>{{titleBankName}}</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="bank-box">
-              <h3>上海银行</h3>
+              <h3>{{titleBankName}}</h3>
             </div>
 
             <div class="container-wrapper">
@@ -24,7 +24,7 @@
                           maxlength="50"
                           style="width: 180px"
                           placeholder="请输入承兑人名称"
-                          v-model="value"
+                          v-model="bank_name"
                         ></el-input>
                       </div>
                     </div>
@@ -36,46 +36,46 @@
                           maxlength="50"
                           style="width: 180px"
                           placeholder="请输入票面金额"
-                          v-model="value"
+                          v-model="face_amt"
                         ></el-input>
                       </div>
                     </div>
                   </div>
                   <div class="searchBtnarr">
-                    <el-button type="primary" plain size="medium">搜索</el-button>
-                    <el-button type="primary" size="medium" @click="addTicket">新增票据</el-button>
+                    <el-button type="primary" plain size="medium" @click="serach">搜索</el-button>
+                    <el-button type="primary" size="medium" @click="addTicket('')">新增票据</el-button>
                   </div>
                 </div>
               </div>
               <div class="table-c">
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
                   <el-table-column type="selection"  width="55"></el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom"  label="融资方式">
-                    <template slot-scope="scope">{{ scope.row.by_interest }}</template>
+                  <el-table-column prop=""  label="融资方式">
+                    <template>直接融资</template>
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom"  label="票号(	后6位)">
+                  <el-table-column prop="draft_no"  label="票号(	后6位)">
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom" label="承兑人">
+                  <el-table-column prop="bank_name" label="承兑人" show-overflow-tooltip>
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom" label="到期日">
+                  <el-table-column prop="expire_date"  label="到期日">
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom" width="160"  label="票面金额（元）">
+                  <el-table-column prop="face_amt"  width="160"  label="票面金额（元）">
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom" width="160"  label="预计折价率（%）">
+                  <el-table-column prop="discount_rate"  width="160"  label="预计折价率（%）">
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom" width="180"  label="预计成交金额（元）">
+                  <el-table-column prop="face_amt"  width="180"  label="预计成交金额（元）">
                   </el-table-column>
-                  <el-table-column prop="by_interest" sortable="custom"  label="操作">
+                  <el-table-column prop=""  label="操作">
                     <template slot-scope="scope">
-                      <span>删除</span>
-                      <span>修改</span>
+                      <span class="operate-span" @click="deleteTicket(scope.row.id)">删除</span>
+                      <span class="operate-span" @click="addTicket(scope.row.id)">修改</span>
                     </template>
                   </el-table-column>
 
                 </el-table>
                 <el-pagination class="pagination-c"  v-if="false"
                   @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                  :current-page="page" :page-sizes="[10, 20, 30, 40]" :page-size="page_size"
+                  :current-page="page" :page-sizes="[10, 20, 30, 40]" :page-size="pagesize"
                   layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
 
@@ -95,18 +95,20 @@
               <el-col :span="4">
                 <div class="grid2">
                   <span class="grid2-tile">已选择</span>
-                  <span class="grid2-value">1</span>
+                  <span class="grid2-value">{{selection.length}}</span>
                 </div>
               </el-col>
               <el-col :span="6">
                 <div class="grid3">
                   <span class="grid3-tile">预计成交金额（元）:</span>
-                  <span class="grid3-value">862,950.00</span>
+                  <span class="grid3-value">{{selectAmout}}</span>
                 </div>
               </el-col>
               <el-col :span="6">
                 <div class="grid4">
-                  <p class="grid4-btn" @click="applyTrade">申请交易</p>
+                  <!-- <p class="grid4-btn" @click="applyTrade" :disabled="isSelected">申请交易</p> -->
+                  <el-button class="" :disabled="selection.length === 0"
+                  type="primary" @click="applyTrade">申请交易</el-button>
                 </div>
               </el-col>
             </el-row>
@@ -117,6 +119,8 @@
     </el-container>
 </template>
 <script>
+import { getTicketCommercialPaperList, ticketoperateCommercialPaper } from '@/api/comTicketApi.js'
+import { mapState } from 'vuex'
 import theHeader from '_c/theHeader'
 import theFooter from '_c/theFooter'
 
@@ -125,41 +129,117 @@ export default {
     theHeader,
     theFooter
   },
+  computed: {
+    ...mapState(['commercialApplyParams'])
+  },
   data () {
     return {
-      listData: [], // 公告列表数据
-      tableData: [
-        {
-          by_interest: '测试'
-        }
-      ],
-      pages: {
-        pageSize: 10, // 分页条数
-        curPage: 1, // 当前页
-        totalPage: 800, // 总页数
-        pageNum: 1 // 分页页码
-      },
-      value: ''
+      isloading: false,
+      titleBankName: '',
+      bank_name: '', // 承兑人名称
+      face_amt: '', // 票面金额
+      tableData: [], // 列表数据
+      pagesize: 10, // 分页条数
+      page: 1, // 当前页
+      total: 0, // 总页数
+      isSelected: false, // 是否已经勾选
+      selection: [],
+      selectAmout: 0 // 已选中金额
     }
   },
   created () {
+    console.log(this.commercialApplyParams, 148)
+    this.setPageData(this.commercialApplyParams)
+    this.getTicketCommercialPaperList()
   },
   mounted () {},
   methods: {
-    // 点击新增票据
-    addTicket () {
-      this.$router.push(this.$routerPath.routerCommercial_operate)
+    // 票据列表页，初始化给数据赋值
+    setPageData (params) {
+      this.titleBankName = params.bankName
+      this.bank_name = params.accepterName
+      this.face_amt = params.amount
+    },
+    // 初始化获取票据列表
+    getTicketCommercialPaperList () {
+      this.isloading = true
+      const params = {
+        bank_name: this.bank_name,
+        face_amt: this.face_amt,
+        page: this.page,
+        pagesize: this.pagesize
+      }
+      try {
+        getTicketCommercialPaperList(params).then(res => {
+          if (res.res === 1) {
+            this.tableData = res.data.list
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
+      this.isloading = false
+    },
+    // 点击搜索
+    serach () {
+      this.getTicketCommercialPaperList()
+    },
+    // 点击新增/修改票据
+    addTicket (id = '') {
+      this.$router.push({ path: this.$routerPath.routerCommercial_operate, query: { id } })
+    },
+    // 删除票据
+    deleteTicket (id) {
+      this.$confirm('是否确认删除该票据?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        console.log('点击确认')
+        this.ticketoperateCommercialPaper(id)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 确认删除票据接口
+    ticketoperateCommercialPaper (id) {
+      const params = {
+        id
+      }
+      try {
+        ticketoperateCommercialPaper(params).then(res => {
+          if (res.res === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.serach()
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
     },
     // 点击申请交易
     applyTrade () {
       this.$router.push(this.$routerPath.routerCommercial_perfectinfo)
     },
+    // 表格选择事件赋值
+    handleSelectionChange (val) {
+      this.selection = val
+      const totalAmunt = val.reduce((total, item) => {
+        return total + parseFloat(item.face_amt)
+      }, 0)
+      this.selectAmout = totalAmunt.toFixed(2)
+    },
     handleSizeChange (val) {
-      this.pages.pageNum = 1
-      this.pages.pageSize = val
+      this.pagesize = val
     },
     handleCurrentChange (val) {
-      this.pages.pageNum = val
+      this.page = val
     }
   }
 }
@@ -250,7 +330,7 @@ export default {
         }
       }
       .grid2{
-         margin-top: 32px;
+         margin-top: 36px;
         .grid2-tile{
           font-size: 14px;
           font-family: PingFang SC;
@@ -266,7 +346,7 @@ export default {
         }
       }
        .grid3{
-         margin-top: 17px;
+         margin-top: 20px;
         .grid3-tile{
           font-size: 14px;
           font-family: PingFang SC;
@@ -283,24 +363,23 @@ export default {
       }
       .grid4{
         text-align: right;
-        .grid4-btn{
+        .el-button--primary{
           width: 216px;
           height: 44px;
-          background: #3688FF;
-          border-radius: 4px;
-          font-size: 14px;
-          font-family: PingFang SC;
-          font-weight: 400;
-          color: #FFFEFE;
-          text-align: center;
-          line-height: 44px;
           margin: 23px auto;
           cursor: pointer;
         }
       }
     }
   }
-
+  .operate-span{
+    font-size: 14px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    color: #3688FF;
+    margin-right: 12px;
+    cursor:pointer;
+  }
 }
 </style>
 <style  lang='less' scoped>

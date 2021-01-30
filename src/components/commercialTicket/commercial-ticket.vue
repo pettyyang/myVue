@@ -145,7 +145,7 @@
                 <el-col :span="6">
                   <div class="banks-item banks-itemlast">
                     <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
-                    <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund">申请融资</el-button></p>
+                    <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p>
                     <p class="banks-do"  @click="operatGuide">操作指引</p>
                   </div>
                 </el-col>
@@ -310,7 +310,14 @@ export default {
       this.$router.push(this.$routerPath.routerCommercial_stepStatus)
     },
     // 点击申请融资
-    goApplyfund () {
+    goApplyfund (item) {
+      console.log(item)
+      const params = {
+        accepterName: item.accepterName || '',
+        amount: item.amount || '',
+        bankName: item.name || ''
+      }
+      this.$store.commit('setCommercialApplyParams', params)
       this.$router.push(this.$routerPath.routerCommercial_apply)
     },
     dateIconClick () {
