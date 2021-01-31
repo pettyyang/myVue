@@ -23,3 +23,9 @@ export const getTicketOperateCommercialPaper = params => post('/business/operate
 export const ticketShowCommercialPaperInfo = params => post('/business/showCommercialPaperInfo', params) // 获取商票秒融新增/修改票据
 
 export const ticketoperateCommercialPaper = params => post('/business/operateCommercialPaper', params) // 获取商票秒融新增/修改票据
+
+export const getTicketBankInfo = params => get('/business/bankInfo', params) // 获取银行卡信息
+
+export const operateCommercialPaperInfo = params => post('/business/operateCommercialPaperInfo', params) // 完善票据信息
+
+export const getEwmInfo = params => get('/Business/getEwmInfo', params) // 获取银行卡信息

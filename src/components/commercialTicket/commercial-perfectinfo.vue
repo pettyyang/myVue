@@ -16,10 +16,29 @@
       </div>
       <!-- 信息 -->
       <div class="info-container mSection-wrapper">
-        <ticketStepLicense :steps="stepBusinessLicense"></ticketStepLicense>
-        <ticketStepLegalPerson :steps="stepLegalPerson"></ticketStepLegalPerson>
-        <ticketAccount :steps="stepAccount"></ticketAccount>
+        <perfectContract></perfectContract>
+        <perfectinVoice></perfectinVoice>
+        <perfectOther></perfectOther>
+
+        <div class="btn-sub-wrapper" style="margin-top: -12px;">
+          <div class="btn-sun-checkbox">
+            <el-checkbox v-model="checked1">我已知悉交易订单是否达成以商票秒融计划审核结果为准。</el-checkbox>
+          </div>
+          <div class="btn-sun-checkbox">
+            <el-checkbox v-model="checked2">
+              我已阅读并同意相关服务协议
+              <a href="">《电子签章授权书》</a>
+              <a href="">《信托贷款合同》</a>
+              <a href="">《票据质押合同》</a>
+            </el-checkbox>
+          </div>
+          <div>
+            <el-button  type="primary" @click="submitForm()">确定</el-button>
+            <el-button  type="primary" plain @click="submitForm()">返回</el-button>
+          </div>
+        </div>
       </div>
+
     </div>
     <!-- 底部 -->
     <theFooter style="flex-shrink: 0"></theFooter>
@@ -30,9 +49,9 @@ import theHeader from '_c/theHeader'
 import theFooter from '_c/theFooter'
 // import theUploadPic from '_c/theUploadPic'
 import theStep from './components/theStep'
-import ticketStepLicense from './components/ticketStepLicense'
-import ticketStepLegalPerson from './components/ticketStepLegalPerson'
-import ticketAccount from './components/ticketAccount'
+import perfectContract from './components/perfectContract'
+import perfectinVoice from './components/perfectinVoice'
+import perfectOther from './components/perfectOther'
 
 import { mapState } from 'vuex'
 import { } from '@/api/api.js'
@@ -41,13 +60,15 @@ export default {
     theHeader,
     theFooter,
     theStep,
-    ticketStepLicense,
-    ticketStepLegalPerson,
-    ticketAccount
-    // theUploadPic
+    perfectContract,
+    perfectinVoice,
+    perfectOther
   },
   data () {
     return {
+      isLoading: false,
+      checked1: false,
+      checked2: false,
       isShowRt: true, // 是否展示右侧登陆注册
       dataBilInfo: {
         // 票据信息
@@ -73,6 +94,9 @@ export default {
       stepAccount: {
         curStep: 3,
         allStep: 3
+      },
+      rules: {
+
       }
     }
   },
@@ -250,7 +274,10 @@ export default {
   .btn-sub-wrapper {
     background: #ffffff;
     margin-top: -40px;
-    padding: 0 0 50px 196px;
+    padding: 0 0 50px 96px;
+    .btn-sun-checkbox{
+      margin-bottom: 12px;
+    }
   }
 }
 .page-full-Register {

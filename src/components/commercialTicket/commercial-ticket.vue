@@ -144,13 +144,15 @@
                 </el-col>
                 <el-col :span="6">
                   <div class="banks-item banks-itemlast">
-                    <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
-                    <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p>
+                    <!-- <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
+                    <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p> -->
+                    <p class="banks-itemp2"><el-button type="primary" size="small" :disabled="item.business_type==='0'" @click="goApplyfund(item)">申请融资</el-button></p>
                     <p class="banks-do"  @click="operatGuide">操作指引</p>
                   </div>
                 </el-col>
               </el-row>
             </div>
+            <div v-if="item.business_type==='2'" class="banks-items-self">数票自营</div>
           </li>
         </ul>
       </div>
@@ -312,13 +314,18 @@ export default {
     // 点击申请融资
     goApplyfund (item) {
       console.log(item)
-      const params = {
-        accepterName: item.accepterName || '',
-        amount: item.amount || '',
-        bankName: item.name || ''
+      if (item.business_type === '2') {
+        const params = {
+          accepterName: item.accepterName || '',
+          amount: item.amount || '',
+          bankName: item.name || ''
+        }
+        this.$store.commit('setCommercialApplyParams', params)
+        this.$router.push(this.$routerPath.routerCommercial_apply)
+      } else {
+        const id = item.id
+        this.$router.push({ path: this.$routerPath.routerCommercial_QRcode, query: { id } })
       }
-      this.$store.commit('setCommercialApplyParams', params)
-      this.$router.push(this.$routerPath.routerCommercial_apply)
     },
     dateIconClick () {
 
@@ -597,6 +604,7 @@ export default {
       background: #FFFFFF;
       box-shadow: 0px 4px 20px 0px #EEE;
       margin-bottom: 24px;
+      position: relative;
       .banks-li-tips{
         width: auto;
         height: 24px;
@@ -668,6 +676,20 @@ export default {
             cursor: pointer;
           }
         }
+      }
+      .banks-items-self{
+        width: 56px;
+        height: 16px;
+        background: #A10300;
+        font-size: 12px;
+        font-family: PingFang SC;
+        font-weight: 500;
+        text-align: center;
+        line-height: 16px;
+        color: #FFF;
+        position: absolute;
+        top: 0px;
+        right: 0px;
       }
     }
   }

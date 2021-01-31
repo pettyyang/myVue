@@ -1,0 +1,294 @@
+{
+  "res": 1,
+  "msg": "SUCCESS",
+  "data": [
+    {
+      "id": "1",
+      "product_name": "数票宝",
+      "product_price": "1",
+      "del": "1",
+      "remark": "温馨提醒：合同签订后七日内支持无条件退款，两月内升级产品可补交差价",
+      "create_time": "2020-08-12 10:04:30",
+      "is_buy": 0,
+      "begin_time": "",
+      "expiry_time": "",
+      "is_tk": 0,
+      "is_expiry": 0,
+      "list": [
+        {
+          "id": "1",
+          "main_id": "1",
+          "product_items": "平台专项培训",
+          "product_items_remark": "通过网络或上门服务，提供相关咨询代办并指导开户、注册、认证直至贴票或交易成功。"
+        },
+        {
+          "id": "2",
+          "main_id": "1",
+          "product_items": "7*24小时客服",
+          "product_items_remark": "在使用交易平台过程中出现任何问题，提供全方位指导和咨询服务，协助企业解决难题。"
+        },
+        {
+          "id": "3",
+          "main_id": "1",
+          "product_items": "票据业务咨询",
+          "product_items_remark": "帮助企业了解持有票据的动态，提示相关风险，接收票据前提供兑付企业违约风险咨询。"
+        },
+        {
+          "id": "4",
+          "main_id": "1",
+          "product_items": "协助票据成交",
+          "product_items_remark": "协助企业在平台出售转让票据，如遇加急出票则寻找全网最低价以最快的速度完成交易。"
+        },
+        {
+          "id": "5",
+          "main_id": "1",
+          "product_items": "定制化货款票",
+          "product_items_remark": "根据需求定制相关票据协助制定付款计划，数票宝年限额3000万元，数票通限额1亿元。"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "product_name": "数票通",
+      "product_price": "2",
+      "del": "1",
+      "remark": "温馨提醒：合同签订后七日内支持无条件退款，两月内升级产品可补交差价",
+      "create_time": "2020-08-12 10:04:32",
+      "is_buy": 0,
+      "begin_time": "",
+      "expiry_time": "",
+      "is_tk": 0,
+      "is_expiry": 0,
+      "list": [
+        {
+          "id": "6",
+          "main_id": "2",
+          "product_items": "平台专项培训",
+          "product_items_remark": "通过网络或上门服务，提供相关咨询代办并指导开户、注册、认证直至贴票或交易成功。"
+        },
+        {
+          "id": "7",
+          "main_id": "2",
+          "product_items": "7*24小时客服",
+          "product_items_remark": "在使用交易平台过程中出现任何问题，提供全方位指导和咨询服务，协助企业解决难题。"
+        },
+        {
+          "id": "8",
+          "main_id": "2",
+          "product_items": "票据业务咨询",
+          "product_items_remark": "帮助企业了解持有票据的动态，提示相关风险，接收票据前提供兑付企业违约风险咨询。"
+        },
+        {
+          "id": "9",
+          "main_id": "2",
+          "product_items": "协助票据成交",
+          "product_items_remark": "协助企业在平台出售转让票据，如遇加急出票则寻找全网最低价以最快的速度完成交易。"
+        },
+        {
+          "id": "10",
+          "main_id": "2",
+          "product_items": "定制化货款票",
+          "product_items_remark": "根据需求定制相关票据协助制定付款计划，数票宝年限额3000万元，数票通限额1亿元。"
+        },
+        {
+          "id": "11",
+          "main_id": "2",
+          "product_items": "票据上门服务",
+          "product_items_remark": "对于票据流转相关需求提供上门服务，对于平台使用以及遇到的难点提供上门辅导指导。"
+        },
+        {
+          "id": "12",
+          "main_id": "2",
+          "product_items": "票据培训会议",
+          "product_items_remark": "与票据相关的风险以及票据融资专项座谈会，客户在服务期内可免费参加，每次限两人。"
+        },
+        {
+          "id": "13",
+          "main_id": "2",
+          "product_items": "票据质押贷款",
+          "product_items_remark": "帮助企业了解地方银行票据质押贷款政策，协助企业与当地银行沟通以及办理相应贷款。"
+        },
+        {
+          "id": "14",
+          "main_id": "2",
+          "product_items": "票据理财计划",
+          "product_items_remark": "根据客户风险喜好以及收益率定制票据理财计划，使客户闲余资金达到安全的保值增值。"
+        },
+        {
+          "id": "15",
+          "main_id": "2",
+          "product_items": "疑难票据解决",
+          "product_items_remark": "当企业持有瑕疵、网红、兑付有风险的票据时，提供相关方案并指导企业化解票据风险。"
+        },
+        {
+          "id": "16",
+          "main_id": "2",
+          "product_items": "兑付法律支持",
+          "product_items_remark": "企业持有的票据出现兑付问题后，平台提供优质免费法律咨询并协助企业制定回款计划。"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "product_name": "数票通",
+      "product_price": "2",
+      "del": "1",
+      "remark": "温馨提醒：合同签订后七日内支持无条件退款，两月内升级产品可补交差价",
+      "create_time": "2020-08-12 10:04:32",
+      "is_buy": 0,
+      "begin_time": "",
+      "expiry_time": "",
+      "is_tk": 0,
+      "is_expiry": 0,
+      "list": [
+        {
+          "id": "6",
+          "main_id": "2",
+          "product_items": "平台专项培训",
+          "product_items_remark": "通过网络或上门服务，提供相关咨询代办并指导开户、注册、认证直至贴票或交易成功。"
+        },
+        {
+          "id": "7",
+          "main_id": "2",
+          "product_items": "7*24小时客服",
+          "product_items_remark": "在使用交易平台过程中出现任何问题，提供全方位指导和咨询服务，协助企业解决难题。"
+        },
+        {
+          "id": "8",
+          "main_id": "2",
+          "product_items": "票据业务咨询",
+          "product_items_remark": "帮助企业了解持有票据的动态，提示相关风险，接收票据前提供兑付企业违约风险咨询。"
+        },
+        {
+          "id": "9",
+          "main_id": "2",
+          "product_items": "协助票据成交",
+          "product_items_remark": "协助企业在平台出售转让票据，如遇加急出票则寻找全网最低价以最快的速度完成交易。"
+        },
+        {
+          "id": "10",
+          "main_id": "2",
+          "product_items": "定制化货款票",
+          "product_items_remark": "根据需求定制相关票据协助制定付款计划，数票宝年限额3000万元，数票通限额1亿元。"
+        },
+        {
+          "id": "11",
+          "main_id": "2",
+          "product_items": "票据上门服务",
+          "product_items_remark": "对于票据流转相关需求提供上门服务，对于平台使用以及遇到的难点提供上门辅导指导。"
+        },
+        {
+          "id": "12",
+          "main_id": "2",
+          "product_items": "票据培训会议",
+          "product_items_remark": "与票据相关的风险以及票据融资专项座谈会，客户在服务期内可免费参加，每次限两人。"
+        },
+        {
+          "id": "13",
+          "main_id": "2",
+          "product_items": "票据质押贷款",
+          "product_items_remark": "帮助企业了解地方银行票据质押贷款政策，协助企业与当地银行沟通以及办理相应贷款。"
+        },
+        {
+          "id": "14",
+          "main_id": "2",
+          "product_items": "票据理财计划",
+          "product_items_remark": "根据客户风险喜好以及收益率定制票据理财计划，使客户闲余资金达到安全的保值增值。"
+        },
+        {
+          "id": "15",
+          "main_id": "2",
+          "product_items": "疑难票据解决",
+          "product_items_remark": "当企业持有瑕疵、网红、兑付有风险的票据时，提供相关方案并指导企业化解票据风险。"
+        },
+        {
+          "id": "16",
+          "main_id": "2",
+          "product_items": "兑付法律支持",
+          "product_items_remark": "企业持有的票据出现兑付问题后，平台提供优质免费法律咨询并协助企业制定回款计划。"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "product_name": "数票通",
+      "product_price": "2",
+      "del": "1",
+      "remark": "温馨提醒：合同签订后七日内支持无条件退款，两月内升级产品可补交差价",
+      "create_time": "2020-08-12 10:04:32",
+      "is_buy": 0,
+      "begin_time": "",
+      "expiry_time": "",
+      "is_tk": 0,
+      "is_expiry": 0,
+      "list": [
+        {
+          "id": "6",
+          "main_id": "2",
+          "product_items": "平台专项培训",
+          "product_items_remark": "通过网络或上门服务，提供相关咨询代办并指导开户、注册、认证直至贴票或交易成功。"
+        },
+        {
+          "id": "7",
+          "main_id": "2",
+          "product_items": "7*24小时客服",
+          "product_items_remark": "在使用交易平台过程中出现任何问题，提供全方位指导和咨询服务，协助企业解决难题。"
+        },
+        {
+          "id": "8",
+          "main_id": "2",
+          "product_items": "票据业务咨询",
+          "product_items_remark": "帮助企业了解持有票据的动态，提示相关风险，接收票据前提供兑付企业违约风险咨询。"
+        },
+        {
+          "id": "9",
+          "main_id": "2",
+          "product_items": "协助票据成交",
+          "product_items_remark": "协助企业在平台出售转让票据，如遇加急出票则寻找全网最低价以最快的速度完成交易。"
+        },
+        {
+          "id": "10",
+          "main_id": "2",
+          "product_items": "定制化货款票",
+          "product_items_remark": "根据需求定制相关票据协助制定付款计划，数票宝年限额3000万元，数票通限额1亿元。"
+        },
+        {
+          "id": "11",
+          "main_id": "2",
+          "product_items": "票据上门服务",
+          "product_items_remark": "对于票据流转相关需求提供上门服务，对于平台使用以及遇到的难点提供上门辅导指导。"
+        },
+        {
+          "id": "12",
+          "main_id": "2",
+          "product_items": "票据培训会议",
+          "product_items_remark": "与票据相关的风险以及票据融资专项座谈会，客户在服务期内可免费参加，每次限两人。"
+        },
+        {
+          "id": "13",
+          "main_id": "2",
+          "product_items": "票据质押贷款",
+          "product_items_remark": "帮助企业了解地方银行票据质押贷款政策，协助企业与当地银行沟通以及办理相应贷款。"
+        },
+        {
+          "id": "14",
+          "main_id": "2",
+          "product_items": "票据理财计划",
+          "product_items_remark": "根据客户风险喜好以及收益率定制票据理财计划，使客户闲余资金达到安全的保值增值。"
+        },
+        {
+          "id": "15",
+          "main_id": "2",
+          "product_items": "疑难票据解决",
+          "product_items_remark": "当企业持有瑕疵、网红、兑付有风险的票据时，提供相关方案并指导企业化解票据风险。"
+        },
+        {
+          "id": "16",
+          "main_id": "2",
+          "product_items": "兑付法律支持",
+          "product_items_remark": "企业持有的票据出现兑付问题后，平台提供优质免费法律咨询并协助企业制定回款计划。"
+        }
+      ]
+    }
+  ]
+}
