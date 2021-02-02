@@ -2,6 +2,12 @@
     <el-container class="page-full-Home page-news" v-loading="isloading">
         <the-header :show-right="true"></the-header>
         <el-main style="width: 1280px;overflow-x: hidden;margin-top:12px;" class="main-wrapper">
+          <el-breadcrumb class="bread-wrapper" separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/commercial-ticket' }">商票秒融</el-breadcrumb-item>
+            <!-- <el-breadcrumb-item :to="{ path: '/commercial-apply' }">票据列表</el-breadcrumb-item> -->
+            <el-breadcrumb-item>二维码</el-breadcrumb-item>
+          </el-breadcrumb>
           <div class="container-wrapper">
             <div class="qrcode-main">
               <el-row>
@@ -13,10 +19,12 @@
                 </el-col>
                 <el-col :span="16">
                   <div class="qrcode-mark">
-                    <h4 class="qrcode-mark-h4">融资要求</h4>
+                    <!-- <h4 class="qrcode-mark-h4">融资要求</h4>
                     <p class="qrcode-mark-p">1、开户真实性：承兑人及开户行白名单准入管理；承兑人注册地和开户行所在地一致性，商票承兑人和出票人必须保持一致；市场黑名单；</p>
                     <p class="qrcode-mark-p">2、交易真实性：发票上传OCR验真，合同上传和发票交叉验证</p>
                     <p class="qrcode-mark-p">3、票据准入审核：背书要求连续，不受理回头票，不受理备注包含“不得转让"，“委托收款”字样的票据票据流转次数不得超限（5次）。</p>
+                   -->
+                   {{remark}}
                   </div>
                 </el-col>
               </el-row>
@@ -43,7 +51,8 @@ export default {
   data () {
     return {
       isloading: false,
-      QRcodeUrl: ''
+      QRcodeUrl: '',
+      remark: ''
     }
   },
   created () {
@@ -54,12 +63,13 @@ export default {
     getEwmInfo () {
       this.isloading = true
       const params = {
-        id: this.$route.query
+        id: this.$route.query.id
       }
       try {
         getEwmInfo(params).then(res => {
           if (res.res === 1) {
-
+            this.QRcodeUrl = res.data.open_ewm
+            this.remark = res.data.remark
           }
         })
       } catch (error) {
@@ -105,6 +115,8 @@ export default {
           }
         }
         .qrcode-mark{
+          white-space:pre-line;
+          line-height: 2;
           .qrcode-mark-h4{
             font-size: 18px;
             font-family: PingFang SC;

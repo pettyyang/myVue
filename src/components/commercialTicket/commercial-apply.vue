@@ -50,10 +50,9 @@
               <div class="table-c">
                 <el-table :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
                   <el-table-column type="selection"  width="55"></el-table-column>
-                  <el-table-column prop=""  label="融资方式">
-                    <template>直接融资</template>
+                  <el-table-column prop="name"  label="融资方式">
                   </el-table-column>
-                  <el-table-column prop="draft_no"  label="票号(	后6位)">
+                  <el-table-column prop="draft_no"  label="票号(	后6位)" width="146">
                   </el-table-column>
                   <el-table-column prop="bank_name" label="承兑人" show-overflow-tooltip>
                   </el-table-column>
@@ -119,7 +118,7 @@
     </el-container>
 </template>
 <script>
-import { getTicketCommercialPaperList, ticketoperateCommercialPaper } from '@/api/comTicketApi.js'
+import { getTicketCommercialPaperList, ticketDelCommercialPaper } from '@/api/comTicketApi.js'
 import { mapState } from 'vuex'
 import theHeader from '_c/theHeader'
 import theFooter from '_c/theFooter'
@@ -157,8 +156,8 @@ export default {
     // 票据列表页，初始化给数据赋值
     setPageData (params) {
       this.titleBankName = params.bankName
-      this.bank_name = params.accepterName
-      this.face_amt = params.amount
+      // this.bank_name = params.accepterName
+      // this.face_amt = params.amount
     },
     // 初始化获取票据列表
     getTicketCommercialPaperList () {
@@ -196,7 +195,7 @@ export default {
         type: 'warning'
       }).then(() => {
         console.log('点击确认')
-        this.ticketoperateCommercialPaper(id)
+        this.ticketDelCommercialPaper(id)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -205,12 +204,12 @@ export default {
       })
     },
     // 确认删除票据接口
-    ticketoperateCommercialPaper (id) {
+    ticketDelCommercialPaper (id) {
       const params = {
         id
       }
       try {
-        ticketoperateCommercialPaper(params).then(res => {
+        ticketDelCommercialPaper(params).then(res => {
           if (res.res === 1) {
             this.$message({
               type: 'success',

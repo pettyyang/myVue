@@ -13,12 +13,32 @@
         <div class="step-box">
           <theStep></theStep>
         </div>
+        <div class="grid-items">
+          <div class="grid-item">
+            <div class="grid-itembox">
+              <p class="grid-itemone">已选择票据总张数（张）</p>
+              <p class="grid-itemtwo">1</p>
+            </div>
+          </div>
+          <div class="grid-item">
+            <div class="grid-itembox grid-itembox-mid">
+              <p class="grid-itemone">已选择票据总张数（张）</p>
+              <p class="grid-itemtwo">900,000.00</p>
+            </div>
+          </div>
+          <div class="grid-item">
+            <div class="grid-itembox grid-itembox-last">
+              <p class="grid-itemone">累计成交金额（元）</p>
+              <p class="grid-itemtwo">862,950.00</p>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- 信息 -->
-      <div class="info-container mSection-wrapper">
-        <perfectContract></perfectContract>
-        <perfectinVoice></perfectinVoice>
-        <perfectOther></perfectOther>
+      <div class="info-container mSection-wrapper" v-loading="isSubmit">
+        <perfectContract @getContractForm="getContractForm"></perfectContract>
+        <perfectinVoice @getVoiceForm="getVoiceForm"></perfectinVoice>
+        <perfectOther @getOtherForm="getOtherForm"></perfectOther>
 
         <div class="btn-sub-wrapper" style="margin-top: -12px;">
           <div class="btn-sun-checkbox">
@@ -34,7 +54,7 @@
           </div>
           <div>
             <el-button  type="primary" @click="submitForm()">确定</el-button>
-            <el-button  type="primary" plain @click="submitForm()">返回</el-button>
+            <el-button  type="primary" plain @click="backApply()">返回</el-button>
           </div>
         </div>
       </div>
@@ -54,7 +74,7 @@ import perfectinVoice from './components/perfectinVoice'
 import perfectOther from './components/perfectOther'
 
 import { mapState } from 'vuex'
-import { } from '@/api/api.js'
+import { operateCommercialPaperInfo } from '@/api/comTicketApi.js'
 export default {
   components: {
     theHeader,
@@ -95,9 +115,12 @@ export default {
         curStep: 3,
         allStep: 3
       },
-      rules: {
-
-      }
+      rules: {},
+      isSubmit: false, // 点击保存
+      ruleForm: {},
+      contractForm: {}, // 合同
+      voiceForm: {}, // 发票
+      otherForm: {} // 其他
     }
   },
   computed: {
@@ -116,16 +139,138 @@ export default {
         this.isShowRt = false
       }
     },
-    // 点击在线签约
-    onlineSign () {
-      this.$router.push('/commercial-submitInfo')
+    // 点击返回
+    backApply () {
+      this.$router.push({ path: this.$routerPath.routerCommercial_apply })
     },
-    getNoteMsg () {
-
+    // 获取合同信息
+    getContractForm (val) {
+      this.contractForm = val
+      console.log('企业营业执照信息=========', this.contractForm)
     },
-    dateIconClick () {
-
+    // 获取发票信息
+    getVoiceForm (val) {
+      this.voiceForm = val
+      console.log('法人信息=========', this.voiceForm)
+    },
+    // 获取其他信息
+    getOtherForm (val) {
+      this.otherForm = val
+      // console.log("最终受益人信息=========", this.otherForm);
+    },
+    // 交易合同是否完成
+    isContractForm () {
+      // 其他信息和开户协议
+      console.log(this.contractForm, 210210)
+      if (JSON.stringify(this.contractForm) !== '{}' &&
+        this.contractForm.contract_url &&
+        this.contractForm.contract_no &&
+        this.contractForm.contract_money
+      ) {
+        return true
+      } else {
+        this.$message('请完善交易合同信息')
+        return false
+      }
+    },
+    // 交易合同是否完成
+    isVoiceForm () {
+      // 其他信息和开户协议
+      console.log(this.voiceForm, 210210)
+      if (JSON.stringify(this.voiceForm) !== '{}' &&
+        this.voiceForm.bill_url &&
+        this.voiceForm.bill_buyer &&
+        this.voiceForm.bill_code &&
+        this.voiceForm.bill_money &&
+        this.voiceForm.bill_seller &&
+        this.voiceForm.bill_no &&
+        this.voiceForm.bill_date
+      ) {
+        return true
+      } else {
+        this.$message('请完善发票信息')
+        return false
+      }
+    },
+    // 其他信息是否完成
+    isOtherForm () {
+      // 其他信息和开户协议
+      console.log(this.otherForm, 210210)
+      if (JSON.stringify(this.otherForm) !== '{}' &&
+        this.otherForm.other_materail_url &&
+        this.otherForm.bank_id &&
+        this.otherForm.is_endorse_bill
+      ) {
+        return true
+      } else {
+        this.$message('请完善其他信息')
+        return false
+      }
+    },
+    // 合并数据
+    mergeData () {
+      // 参数1. 交易合同
+      if (this.contractForm) {
+        const ruleForm = this.ruleForm
+        console.log(this.ruleForm, this.contractForm)
+        this.ruleForm = Object.assign(ruleForm, this.contractForm)
+      }
+      // 参数2. 发票信息
+      if (this.voiceForm) {
+        const ruleForm = this.ruleForm
+        this.ruleForm = Object.assign(ruleForm, this.voiceForm)
+      }
+      // 参数3. 其他信息
+      if (this.otherForm) {
+        const ruleForm = this.ruleForm
+        this.ruleForm = Object.assign(ruleForm, this.otherForm)
+      }
+    },
+    // 企业信息提交
+    submitForm () {
+      if (this.isContractForm() &&
+      this.isVoiceForm() &&
+      this.isOtherForm()
+      ) {
+        this.mergeData()
+        console.log('企业信息提交', this.ruleForm)
+        this.formatParams()
+        const fd = this.formatParams()
+        this.fetch_openbank(fd)
+      }
+    },
+    formatParams () {
+      let fd = new FormData()
+      const ruleForm = this.ruleForm
+      console.log(ruleForm, 292)
+      for (let key in ruleForm) {
+        fd.append(key, ruleForm[key])
+      }
+      return fd
+    },
+    // 提交接口
+    fetch_openbank (fd) {
+      if (fd) {
+        this.isSubmit = true
+        try {
+          operateCommercialPaperInfo(fd).then(res => {
+            this.isSubmit = false
+            if (res.res === 1) {
+              this.$message(res.msg)
+              // const params = {
+              //   bankName: 'BAIXIN',
+              //   status: '2'
+              // }
+              // this.$methods.toRouter(this.$routerPath.routerPath_openRNameStepStatus, params)
+            }
+          })
+        } catch (error) {
+          this.isSubmit = false
+          this.$message(error.message || error)
+        }
+      }
     }
+
   },
   mounted () {}
 
@@ -229,12 +374,48 @@ export default {
 // 进度条样式
 .step-container{
   width: 1280px;
-  height: 136px;
+  height: 240px;
   background: #FFFFFF;
   margin: 12px auto;
   .step-box{
     padding-top: 40px;
   }
+}
+.grid-items{
+  width: 1120px;
+  height: 100px;
+  background: #F6F6F6;
+  margin: 20px auto 0;
+  padding: 20px 27px;
+  display: flex;
+  .grid-item{
+    flex: 1;
+    .grid-itembox{
+      width: 200px;
+      &.grid-itembox-mid{
+        margin: 0 auto;
+      }
+      &.grid-itembox-last{
+        margin-left: 140px;
+      }
+      .grid-itemone{
+        text-align: center;
+        font-size: 14px;
+        font-family: PingFang SC;
+        font-weight: 500;
+        color: #999;
+        margin-bottom: 10px;
+      }
+      .grid-itemtwo{
+        text-align: center;
+        font-size: 30px;
+        font-family: DIN;
+        font-weight: bold;
+        color: #EEB131;
+      }
+    }
+  }
+
 }
 </style>
 

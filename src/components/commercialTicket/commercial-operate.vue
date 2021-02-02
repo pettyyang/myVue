@@ -3,8 +3,9 @@
         <the-header :show-right="true"></the-header>
         <el-main style="width: 1280px;overflow-x: hidden;" class="main-wrapper">
             <el-breadcrumb class="bread-wrapper" separator="/">
-                <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+                <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
                 <el-breadcrumb-item :to="{ path: '/commercial-ticket' }">商票秒融</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{ path: '/commercial-apply' }">票据列表</el-breadcrumb-item>
                 <el-breadcrumb-item>添加</el-breadcrumb-item>
             </el-breadcrumb>
 
@@ -136,7 +137,7 @@ export default {
     }
   },
   created () {
-    this.ticketId = this.$route.query
+    this.ticketId = this.$route.query.id
     this.ticketShowCommercialPaperInfo()
   },
   mounted () {},
@@ -147,6 +148,7 @@ export default {
       const params = {
         id: this.ticketId
       }
+      console.log(params)
       this.isloading = true
       try {
         ticketShowCommercialPaperInfo(params).then(res => {
@@ -209,6 +211,14 @@ export default {
       try {
         getTicketOperateCommercialPaper(params).then(res => {
           this.isEnquirySuccess = false
+          this.$message({
+            type: 'success',
+            message: '保存成功,即将返回!',
+            duration: 1000
+          })
+          setTimeout(() => {
+            this.$router.push({ path: this.$routerPath.routerCommercial_apply })
+          }, 1100)
         })
       } catch (error) {
         this.isEnquirySuccess = false

@@ -44,7 +44,7 @@
             收款账户:
           </span>
           <div class="flex">
-            <el-select v-model="value" placeholder="请选择" class="mItem-long">
+            <el-select v-model="bankInfo.back_accountSet" placeholder="请选择" class="mItem-long">
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -65,7 +65,7 @@
                 <img class="header-pic" src="@/assets/img/avator.png" />
                 <span>{{ bankInfo.bank_name }}</span>
               </div>
-              <div class="mForm-account-bankNo">{{bankInfo.back_account}}</div>
+              <div class="mForm-account-bankNo">{{bankInfo.back_accountSet}}</div>
               <div class="mForm-account-item">用户：{{bankInfo.company_name}}</div>
               <div class="mForm-account-item">开户行行号：{{bankInfo.bank_code}}</div>
               <div class="mForm-account-item">开户行：{{bankInfo.bank_childname}}</div>
@@ -112,6 +112,7 @@ export default {
       bankInfo: {
         bank_name: '', // 开户行名称
         back_account: '', // 对公账户号
+        back_accountSet: '', // 带省略号账户
         bank_code: '', // 开户行编码
         back_cnap: '', // 开户行银联编码
         bank_childname: '', // 开户行支行名称
@@ -141,7 +142,7 @@ export default {
     // 上传其他材料时的url
     getOtherFileUrl (url) {
       console.log(url)
-      this.contractForm.contract_url = url
+      this.otherForm.other_materail_url = url
     },
     // 初始化赋值背书情况
     setEndorseBill () {
@@ -155,17 +156,32 @@ export default {
     getTicketBankInfo () {
       try {
         getTicketBankInfo().then(res => {
-          if (res.res === 1 && res.data.length > 0) {
+          if (res.res === 1) {
             const info = res.data
-            this.bankInfo.bank_name = info.bank_name
+            this.bankInfo = info
+            // this.bankInfo.back_accountSet = this.getHideBankNo(info.back_account)
+            this.bankInfo.back_accountSet = info.back_account
+            this.otherForm.bank_id = info.id
           }
         })
       } catch (error) {
         console.log(error)
       }
     },
+    // 银行卡号*号模式
+    getHideBankNo (bankNo) {
+      const str = bankNo
+        .match(/(\d{4})(\d{4})(\d{4})/)
+        .slice(1)
+        .reduce(function (value, item, index) {
+        // 当index===1时，初始元素和当前元素累加并返回，value是初始值186，也是最终累加的返回值，item是当前索引下标是1的元素****。
+          return index === 1 ? value + '****' : value + item
+        })
+      console.log(str)
+      return str
+    },
     inputEnterName () {
-      this.$emit('getVoiceForm', this.voiceForm)
+      this.$emit('getOtherForm', this.otherForm)
     }
   },
   watch: {

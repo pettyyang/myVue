@@ -22,7 +22,7 @@
           合同编号:
         </span>
         <div class="flex">
-          <el-input class="mItem-long" placeholder="请输入合同编号" v-model="contractForm.contractNo"></el-input>
+          <el-input class="mItem-long" placeholder="请输入合同编号" v-model="contractForm.contract_no"></el-input>
         </div>
       </el-form-item>
 

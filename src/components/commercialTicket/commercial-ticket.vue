@@ -48,14 +48,14 @@
                     <img src="@/assets/img/start.png" />
                     <span>承兑名称</span>
                   </div>
-                  <el-input placeholder="请输入承兑人名称" v-model="dataBilInfo.accepterName" style="width: 260px;" class="elinput elinput-w"></el-input>
+                  <el-input placeholder="请输入承兑人名称" v-model="dataBilInfo.accepterName" style="width: 260px;" class="elinput elinput-w" @change="accNameChange"></el-input>
                 </div>
                 <div class="ipt">
                   <div class="bank">
                     <img src="@/assets/img/start.png" />
                     <span>票面金额</span>
                   </div>
-                  <el-input placeholder="请输入票面金额" v-model="dataBilInfo.amt" style="width: 260px;" class="elinput elinput-w fixed-text">
+                  <el-input placeholder="请输入票面金额" v-model="dataBilInfo.amt" style="width: 260px;" class="elinput elinput-w fixed-text" @change="amtChange">
                     <span slot="suffix">万元</span>
                   </el-input>
                 </div>
@@ -65,8 +65,9 @@
                     <span>到期日期</span>
                   </div>
                   <div class="date-picker">
-                    <el-date-picker class="elinput elinput-w datePickerIpt" v-model="dataBilInfo.maturityDate" value-format="yyyy-MM-dd" type="date" :editable="false" align="right" placeholder="选择日期"></el-date-picker>
-                    <img @click="dateIconClick" src="@/assets/img/ic_sj_rq.png" />
+                    <el-date-picker class="elinput elinput-w datePickerIpt" v-model="dataBilInfo.maturityDate" value-format="yyyy-MM-dd" type="date" :editable="false"
+                    align="right" placeholder="选择日期" @change="datePickerChange"></el-date-picker>
+                    <img src="@/assets/img/ic_sj_rq.png" />
                   </div>
 
                   <!-- <el-input suffix-icon="el-icon-date" v-model='remitDate' class="elinput"></el-input> -->
@@ -97,9 +98,9 @@
                 </div>
               </div>
               <div class="rate-lists">
-                <p class="cursor-p">订单管理</p>
-                <p>|</p>
-                <p class="cursor-p">承兑人名单</p>
+                <!-- <p class="cursor-p">订单管理</p>
+                <p>|</p> -->
+                <p class="cursor-p"  @click="popEg(while_url)">承兑人名单</p>
               </div>
             </div>
           </el-col>
@@ -144,10 +145,15 @@
                 </el-col>
                 <el-col :span="6">
                   <div class="banks-item banks-itemlast">
-                    <!-- <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
-                    <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p> -->
-                    <p class="banks-itemp2"><el-button type="primary" size="small" :disabled="item.business_type==='0'" @click="goApplyfund(item)">申请融资</el-button></p>
-                    <p class="banks-do"  @click="operatGuide">操作指引</p>
+                    <div v-if="isShowRt">
+                      <p class="banks-itemp1"><el-button type="primary" plain size="small" @click="goLogin">在线签约</el-button></p>
+
+                    </div>
+                    <div v-else>
+                      <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
+                      <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p>
+                    </div>
+                    <p class="banks-do" v-if="item.instructions"  @click="operatGuide(item.instructions)">操作指引</p>
                   </div>
                 </el-col>
               </el-row>
@@ -157,6 +163,8 @@
         </ul>
       </div>
     </div>
+    <!-- pdf预览 -->
+    <theView :egSrc="egSrc" @closePop="closePop" v-if="isShowViewPop"></theView>
     <!-- 议价交易 -->
     <theFexied v-show="false"></theFexied>
     <theFooter style="flex-shrink: 0"></theFooter>
@@ -167,17 +175,19 @@ import theHeader from '_c/theHeader'
 import theFooter from '_c/theFooter'
 import theSwiper from './components/theTicketSwiper'
 import theUploadPic from '_c/theUploadPic'
+import theView from '_c/theView'
 
 import theFexied from '_c/theFexied'
 import { mapState } from 'vuex'
-import { getTicketBillinfo, getTicketwhileList, getTicketBankLists, getTicketFinance } from '@/api/comTicketApi.js'
+import { getTicketBillinfo, getTicketwhileList, getTicketBankLists, getTicketFinance, getTicketOperateCommercialPaper } from '@/api/comTicketApi.js'
 export default {
   components: {
     theHeader,
     theFooter,
     theSwiper,
     theFexied,
-    theUploadPic
+    theUploadPic,
+    theView
   },
   data () {
     return {
@@ -198,7 +208,9 @@ export default {
       isEnquirySuccess: false,
       isCanEnquiry: true,
       isHas: false, // 是否已签约
-      banklists: []
+      banklists: [],
+      egSrc: '', // pdf路径
+      isShowViewPop: '' // pdf预览是否展示
     }
   },
   computed: {
@@ -227,6 +239,7 @@ export default {
           if (res.res === 1) {
             this.business_price = res.data.price.business_price
             this.bank_price = res.data.price.bank_price
+            this.while_url = res.data.while_url
           }
         })
       } catch (error) {
@@ -274,6 +287,7 @@ export default {
     // 商票秒融首页提交试算/开始计算接口
     getTicketFinance () {
       const billInfo = this.billInfo
+      this.isEnquirySuccess = true
       const loadingInstance = this.$loading({
         text: '计算中'
       })
@@ -289,27 +303,51 @@ export default {
         getTicketFinance(params).then(res => {
           if (res.res === 1) {
             this.banklists = res.data
+            this.isEnquirySuccess = false
             loadingInstance.close()
           }
         })
       } catch (error) {
         console.log(error)
       }
+      this.isEnquirySuccess = false
       this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
         loadingInstance.close()
       }, 1000)
     },
+    // 承兑人change事件
+    accNameChange () {
+      this.billInfo.accepterName = this.dataBilInfo.accepterName
+    },
+    // 票面金额change事件
+    amtChange () {
+      this.billInfo.billAmt = this.dataBilInfo.amt
+    },
+    // 到期日点击change事件
+    datePickerChange () {
+      this.billInfo.maturityDate = this.dataBilInfo.maturityDate
+    },
     // 点击开始计算按钮
     startEnquiry () {
       this.getTicketFinance()
+    },
+    // 未登录时，点击在线签约跳转至登录页
+    goLogin () {
+      this.$router.push(this.$routerPath.routerPath_login)
     },
     // 点击在线签约
     onlineSign () {
       this.$router.push(this.$routerPath.routerCommercial_submitInfo)
     },
     // 操作指引
-    operatGuide () {
-      this.$router.push(this.$routerPath.routerCommercial_stepStatus)
+    operatGuide (instructionsUrl) {
+      // this.$router.push(this.$routerPath.routerCommercial_stepStatus)
+      console.log(instructionsUrl)
+      if (instructionsUrl && instructionsUrl.indexOf('?')) {
+        const id = instructionsUrl.substr(1).split('=')[1]
+        console.log(id)
+        this.$router.push({ path: this.$routerPath.routerPath_newDetail, query: { id } })
+      }
     },
     // 点击申请融资
     goApplyfund (item) {
@@ -320,15 +358,54 @@ export default {
           amount: item.amount || '',
           bankName: item.name || ''
         }
-        this.$store.commit('setCommercialApplyParams', params)
-        this.$router.push(this.$routerPath.routerCommercial_apply)
+        if (item.business_volume === '--') {
+          this.$store.commit('setCommercialApplyParams', params)
+          this.$router.push(this.$routerPath.routerCommercial_apply)
+        } else {
+          // 已经点击了计算票据，则先调用新增票据接口
+          this.saveCommercial(item)
+        }
       } else {
         const id = item.id
         this.$router.push({ path: this.$routerPath.routerCommercial_QRcode, query: { id } })
       }
     },
-    dateIconClick () {
-
+    // 新增票据，保存事件
+    saveCommercial (item) {
+      const info = this.billInfo
+      const params = {
+        id: '', // 票据id（修改必填）
+        bill_url: this.originUrl, // 票据url地址
+        bank_name: info.accepterName, // 承兑人
+        finance_type: item.id, // 融资类型
+        bank_no: info.accepterBank, // 承兑行行号
+        draft_no: info.billNo, // 票号
+        face_amt: info.billAmt, // 票面金额
+        expire_date: info.maturityDate // 到期日
+      }
+      try {
+        getTicketOperateCommercialPaper(params).then(res => {
+          this.$message({
+            type: 'success',
+            message: '票据新增成功,即将跳转!',
+            duration: 1000
+          })
+          setTimeout(() => {
+            this.$router.push({ path: this.$routerPath.routerCommercial_apply })
+          }, 1100)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    //  打开查看示例 切换示例地址
+    popEg (src) {
+      this.egSrc = src
+      this.isShowViewPop = !this.isShowViewPop
+    },
+    // 关闭查看示例
+    closePop () {
+      this.isShowViewPop = false
     }
   },
   mounted () {}
