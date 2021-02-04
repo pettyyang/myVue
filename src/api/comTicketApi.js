@@ -28,4 +28,6 @@ export const getTicketBankInfo = params => get('/business/bankInfo', params) // 
 
 export const operateCommercialPaperInfo = params => post('/business/operateCommercialPaperInfo', params) // 完善票据信息
 
-export const getEwmInfo = params => get('/Business/getEwmInfo', params) // 获取银行卡信息
+export const getEwmInfo = params => get('/Business/getEwmInfo', params) // 申请融资二维码信息
+
+export const getTicketUserInfo = params => get('/Business/userInfo', params) // 查询用户和企业信息

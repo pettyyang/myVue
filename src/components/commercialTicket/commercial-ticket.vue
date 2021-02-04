@@ -100,7 +100,7 @@
               <div class="rate-lists">
                 <!-- <p class="cursor-p">订单管理</p>
                 <p>|</p> -->
-                <p class="cursor-p"  @click="popEg(while_url)">承兑人名单</p>
+                <p class="cursor-p"  @click="seeWhilePdf">承兑人名单</p>
               </div>
             </div>
           </el-col>
@@ -153,7 +153,10 @@
                       <p class="banks-itemp1" v-if="item.business_type==='0'"><el-button type="primary" plain size="small" @click="onlineSign">在线签约</el-button></p>
                       <p class="banks-itemp2" v-else><el-button type="primary" size="small" @click="goApplyfund(item)">申请融资</el-button></p>
                     </div>
-                    <p class="banks-do" v-if="item.instructions"  @click="operatGuide(item.instructions)">操作指引</p>
+                    <!-- <p class="banks-do" v-if="item.instructions"  @click="operatGuide(item.instructions)">操作指引</p> -->
+                    <p class="banks-do" v-if="item.instructions">
+                      <a :href="item.instructions"  target="_blank">操作指引</a>
+                    </p>
                   </div>
                 </el-col>
               </el-row>
@@ -163,11 +166,19 @@
         </ul>
       </div>
     </div>
-    <!-- pdf预览 -->
+    <!-- 图片预览 -->
     <theView :egSrc="egSrc" @closePop="closePop" v-if="isShowViewPop"></theView>
     <!-- 议价交易 -->
     <theFexied v-show="false"></theFexied>
     <theFooter style="flex-shrink: 0"></theFooter>
+    <!-- pdf预览 -->
+    <el-dialog
+      title="承兑人名单"
+      :visible.sync="centerDialogVisible"
+      width="1280px"
+      >
+      <iframe :src="while_url" frameborder="0" style="width:100%;height:440px"></iframe>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -179,7 +190,8 @@ import theView from '_c/theView'
 
 import theFexied from '_c/theFexied'
 import { mapState } from 'vuex'
-import { getTicketBillinfo, getTicketwhileList, getTicketBankLists, getTicketFinance, getTicketOperateCommercialPaper } from '@/api/comTicketApi.js'
+import { getTicketBillinfo, getTicketwhileList, getTicketBankLists, getTicketFinance, getTicketOperateCommercialPaper,
+  getTicketUserInfo } from '@/api/comTicketApi.js'
 export default {
   components: {
     theHeader,
@@ -210,7 +222,8 @@ export default {
       isHas: false, // 是否已签约
       banklists: [],
       egSrc: '', // pdf路径
-      isShowViewPop: '' // pdf预览是否展示
+      isShowViewPop: '', //
+      centerDialogVisible: false // pdf预览是否展示
     }
   },
   computed: {
@@ -337,20 +350,57 @@ export default {
     },
     // 点击在线签约
     onlineSign () {
-      this.$router.push(this.$routerPath.routerCommercial_submitInfo)
+      // this.$router.push(this.$routerPath.routerCommercial_submitInfo)
+      this.$message({
+        type: 'warning',
+        message: '暂未开通',
+        showClose: true
+      })
     },
-    // 操作指引
+    // 操作指引,暂时废弃，使用打开新页面方式
     operatGuide (instructionsUrl) {
       // this.$router.push(this.$routerPath.routerCommercial_stepStatus)
       console.log(instructionsUrl)
       if (instructionsUrl && instructionsUrl.indexOf('?')) {
         const id = instructionsUrl.substr(1).split('=')[1]
         console.log(id)
-        this.$router.push({ path: this.$routerPath.routerPath_newDetail, query: { id } })
+        // this.$router.push({ path: this.$routerPath.routerPath_newDetail, query: { id } })
       }
     },
     // 点击申请融资
     goApplyfund (item) {
+      console.log(item)
+      this.getTicketUserInfo(item)
+    },
+    // 点击申请融资，调用接口判断是否认证成功
+    getTicketUserInfo (item) {
+      /*
+        type：用户类型，
+          1-基石合伙人，2-高级合伙人，3-经纪人，4-客户
+        user_status：用户认证状态，
+          1已注册，2待审核，3审核通过待打款，4打款完成待验证，5已完成，
+          6企业信息有误认证失败驳回，7打款验证失败 8对公信息有误驳回
+      */
+      try {
+        getTicketUserInfo().then(res => {
+          if (res.res === 1) {
+            if (res.data.user_status === '5') {
+              this.goApplyfundRouter(item)
+            } else {
+              this.$message({
+                type: 'warning',
+                message: '您还未完成企业实名认证，请认证完成后再进行操作！',
+                showClose: true
+              })
+            }
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    // 点击申请融资，路由跳转判断
+    goApplyfundRouter (item) {
       console.log(item)
       if (item.business_type === '2') {
         const params = {
@@ -398,10 +448,9 @@ export default {
         console.log(error)
       }
     },
-    //  打开查看示例 切换示例地址
-    popEg (src) {
-      this.egSrc = src
-      this.isShowViewPop = !this.isShowViewPop
+    // 点击查看承兑人名单pdf
+    seeWhilePdf (src) {
+      this.centerDialogVisible = true
     },
     // 关闭查看示例
     closePop () {
@@ -744,13 +793,16 @@ export default {
         .banks-itemlast{
           text-align: right;
           .banks-do{
-            font-size: 14px;
-            font-family: Source Han Sans CN;
-            font-weight: 500;
-            color: #3688FF;
             margin-top: 14px;
             margin-right: 14px;
             cursor: pointer;
+            a{
+              text-decoration: none;
+              font-size: 14px;
+              font-family: Source Han Sans CN;
+              font-weight: 500;
+              color: #3688FF;
+            }
           }
         }
       }

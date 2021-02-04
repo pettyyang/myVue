@@ -17,19 +17,19 @@
           <div class="grid-item">
             <div class="grid-itembox">
               <p class="grid-itemone">已选择票据总张数（张）</p>
-              <p class="grid-itemtwo">1</p>
+              <p class="grid-itemtwo">{{selNum}}</p>
             </div>
           </div>
-          <div class="grid-item">
+          <div class="grid-item" @click="goStatus">
             <div class="grid-itembox grid-itembox-mid">
-              <p class="grid-itemone">已选择票据总张数（张）</p>
-              <p class="grid-itemtwo">900,000.00</p>
+              <p class="grid-itemone">已选择总金额（元）</p>
+              <p class="grid-itemtwo">{{selectAmout}}</p>
             </div>
           </div>
           <div class="grid-item">
             <div class="grid-itembox grid-itembox-last">
-              <p class="grid-itemone">累计成交金额（元）</p>
-              <p class="grid-itemtwo">862,950.00</p>
+              <p class="grid-itemone">已选择预计成交总金额（元）</p>
+              <p class="grid-itemtwo">{{selEstimatedCost}}</p>
             </div>
           </div>
         </div>
@@ -52,9 +52,9 @@
               <a href="">《票据质押合同》</a>
             </el-checkbox>
           </div>
-          <div>
-            <el-button  type="primary" @click="submitForm()">确定</el-button>
-            <el-button  type="primary" plain @click="backApply()">返回</el-button>
+          <div class="button-box">
+            <el-button  type="primary" size="small" @click="submitForm()">确定</el-button>
+            <el-button  type="primary" size="small" plain @click="backApply()">返回</el-button>
           </div>
         </div>
       </div>
@@ -87,8 +87,11 @@ export default {
   data () {
     return {
       isLoading: false,
-      checked1: false,
-      checked2: false,
+      checked1: false, // 条例1是否勾选
+      checked2: false, // 条例2是否勾选
+      selEstimatedCost: 0, // 已选中预计成交金额
+      selNum: 0, // 已选中票据数据
+      selectAmout: 0, // 已选中票面金额
       isShowRt: true, // 是否展示右侧登陆注册
       dataBilInfo: {
         // 票据信息
@@ -102,7 +105,7 @@ export default {
       isCanEnquiry: false,
       startEnquiry: '',
       isHas: false, // 是否已签约
-      banklists: ['中信银行', '广发银行'],
+      banklists: [],
       stepBusinessLicense: {
         curStep: 1,
         allStep: 3
@@ -128,16 +131,37 @@ export default {
   },
   created () {
     this.getUserMsg()
+    const params = this.$route.query
+    this.selEstimatedCost = this.milliFormat(params.selEstimatedCost)
+    this.selNum = params.selNum
+    this.selectAmout = this.milliFormat(params.selectAmout)
   },
   watch: {
 
   },
   methods: {
+    goStatus () {
+
+    },
     // 获取用户登录信息
     getUserMsg () {
       if (localStorage.getItem('userToken') && this.userInfo.telephone && this.userInfo.id && JSON.parse(localStorage.getItem('userInfo')) && JSON.parse(localStorage.getItem('userInfo')).sessionid) {
         this.isShowRt = false
       }
+    },
+    // 添加千位符
+    milliFormat (num) {
+      let s = num.toString()
+      if (/[^0-9\.]/.test(s)) return 'invalid value'
+      s = s.replace(/^(\d*)$/, '$1.')
+      s = (s + '00').replace(/(\d*\.\d\d)\d*/, '$1')
+      s = s.replace('.', ',')
+      const re = /(\d)(\d{3},)/
+      while (re.test(s)) {
+        s = s.replace(re, '$1,$2')
+      }
+      s = s.replace(/,(\d\d)$/, '.$1')
+      return s.replace(/^\./, '0.')
     },
     // 点击返回
     backApply () {
@@ -232,11 +256,19 @@ export default {
       this.isVoiceForm() &&
       this.isOtherForm()
       ) {
-        this.mergeData()
-        console.log('企业信息提交', this.ruleForm)
-        this.formatParams()
-        const fd = this.formatParams()
-        this.fetch_openbank(fd)
+        if (this.checked1 && this.checked2) {
+          this.mergeData()
+          console.log('企业信息提交', this.ruleForm)
+          this.formatParams()
+          const fd = this.formatParams()
+          this.fetch_openbank(fd)
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '请先勾选上面两个条款！',
+            showClose: true
+          })
+        }
       }
     },
     formatParams () {
@@ -262,6 +294,7 @@ export default {
               //   status: '2'
               // }
               // this.$methods.toRouter(this.$routerPath.routerPath_openRNameStepStatus, params)
+              this.$methods.toRouter(this.$routerPath.routerCommercial_stepStatus)
             }
           })
         } catch (error) {
@@ -416,6 +449,10 @@ export default {
     }
   }
 
+}
+.button-box{
+  width: 122px;
+  margin: 32px auto 0;
 }
 </style>
 

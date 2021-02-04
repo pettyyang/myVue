@@ -12,7 +12,7 @@
           上传发票:
         </span>
         <div class="item-upImg">
-          <theUploadPic @getFile="getTicketMsg">
+          <theUploadPic @getFile="getTicketMsg" v-loading="isIdentifyOk">
             <template v-slot:picture v-if="voiceForm.bill_url">
               <div class="same-legal-img-font">
                 <img @mouseenter="isDeleteFont = true" :src="voiceForm.bill_url" />
@@ -143,6 +143,7 @@ export default {
     return {
       isDeleteFont: '',
       isLoading: false,
+      isIdentifyOk: false, // 上传发票，加载条
       isShowViewPop: false,
       egSrc: '', // 查看示例
       voiceForm: {

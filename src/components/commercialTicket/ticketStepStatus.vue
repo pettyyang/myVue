@@ -17,9 +17,10 @@
       <div class="certification" v-if="status == '3' || status == '4'">
         <img src="@/assets/img/certification-icon.png" />
         <div class="retry-msg">
-          <p class="prompt">您的开通{{ bankName }}审核失败</p>
+          <p class="prompt">您提交的资料审核失败</p>
           <p class="contact">失败原因：{{ remark_error }}</p>
-          <p class="contact">如有疑问请联系客户{{ $store.state.baseServiceTel }}</p>
+          <!-- <p class="contact">如有疑问请联系客户{{ $store.state.baseServiceTel }}</p> -->
+          <p class="contact">如有疑问请联系客户4000-666-8888</p>
           <el-button class="retry-btn" @click="again">重新提交信息</el-button>
         </div>
       </div>
@@ -27,8 +28,8 @@
       <div class="certification" v-if="status == '2'">
         <img src="@/assets/img/renzhengzhong-icon.png" />
         <div class="retry-msg">
-          <p class="prompt">您的开通{{ bankName }}正在审核中</p>
-          <p class="contact">如有疑问请联系客户{{ $store.state.baseServiceTel }}</p>
+          <p class="prompt">您提交的资料平台正在审核中，请耐心等候</p>
+          <p class="contact">如有疑问请联系客户4000-666-8888</p>
           <el-button class="retry-btn" :loading="refersh" @click="getStatus">刷新审核状态</el-button>
         </div>
       </div>
@@ -46,8 +47,8 @@
                     <el-button class="retry-btn">确定</el-button>
                 </div> -->
         <div class="retry-msg">
-          <p class="prompt">您的开通{{ bankName }}审核成功</p>
-          <p class="contact">如有疑问请联系客户{{ $store.state.baseServiceTel }}</p>
+          <p class="prompt">您提交的资料审核成功</p>
+          <p class="contact">如有疑问请联系客户4000-666-8888</p>
           <el-button class="retry-btn" @click="toHome">开始贴现</el-button>
         </div>
       </div>
@@ -72,21 +73,21 @@ export default {
     return {
       refersh: false,
       bankName: '',
-      status: '', // 0 未申请 1 成功 2 审核中 3 驳回 4 重新填写信息
+      status: '2', // 0 未申请 1 成功 2 审核中 3 驳回 4 重新填写信息
       amount: '', // 打款金额
       remark_error: '',
       jdUrl: ''
     }
   },
   created () {
-    if (this.$route.query.channel === 'jd') {
-      this.bankName = this.$route.query.bankName
-      this.status = this.$route.query.status
-      this.remark_error = window.sessionStorage.getItem('jdRemark')
-      this.jdUrl = window.sessionStorage.getItem('jdUrl')
-    } else {
-      this.getStatus()
-    }
+    // if (this.$route.query.channel === 'jd') {
+    //   this.bankName = this.$route.query.bankName
+    //   this.status = this.$route.query.status
+    //   this.remark_error = window.sessionStorage.getItem('jdRemark')
+    //   this.jdUrl = window.sessionStorage.getItem('jdUrl')
+    // } else {
+    //   this.getStatus()
+    // }
   },
   computed: {
     ...mapState(['userInfo'])
@@ -103,6 +104,8 @@ export default {
     },
     // 重新提交
     again () {
+      const stop = true
+      if (stop) return
       let params = this.$route.query
       if (params.channel === 'jd') {
         window.open(this.jdUrl)

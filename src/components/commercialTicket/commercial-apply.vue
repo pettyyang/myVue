@@ -62,7 +62,7 @@
                   </el-table-column>
                   <el-table-column prop="discount_rate"  width="160"  label="预计折价率（%）">
                   </el-table-column>
-                  <el-table-column prop="face_amt"  width="180"  label="预计成交金额（元）">
+                  <el-table-column prop="estimated_cost"  width="180"  label="预计成交金额（元）">
                   </el-table-column>
                   <el-table-column prop=""  label="操作">
                     <template slot-scope="scope">
@@ -100,7 +100,7 @@
               <el-col :span="6">
                 <div class="grid3">
                   <span class="grid3-tile">预计成交金额（元）:</span>
-                  <span class="grid3-value">{{selectAmout}}</span>
+                  <span class="grid3-value">{{selEstimatedCost}}</span>
                 </div>
               </el-col>
               <el-col :span="6">
@@ -143,7 +143,8 @@ export default {
       total: 0, // 总页数
       isSelected: false, // 是否已经勾选
       selection: [],
-      selectAmout: 0 // 已选中金额
+      selectAmout: 0, // 已选中票面金额
+      selEstimatedCost: 0 // 已选中预计成交金额
     }
   },
   created () {
@@ -224,15 +225,25 @@ export default {
     },
     // 点击申请交易
     applyTrade () {
-      this.$router.push(this.$routerPath.routerCommercial_perfectinfo)
+      this.$router.push({ path: this.$routerPath.routerCommercial_perfectinfo,
+        query: {
+          selectAmout: this.selectAmout,
+          selEstimatedCost: this.selEstimatedCost,
+          selNum: this.selection.length
+        }
+      })
     },
     // 表格选择事件赋值
     handleSelectionChange (val) {
       this.selection = val
-      const totalAmunt = val.reduce((total, item) => {
-        return total + parseFloat(item.face_amt)
+      let selectAmout = 0 // 票面金额
+      let selEstimatedCost = 0 // 预计成交金额
+      val.forEach(item => {
+        selectAmout += parseFloat(item.face_amt)
+        selEstimatedCost += parseFloat(item.estimated_cost)
       }, 0)
-      this.selectAmout = totalAmunt.toFixed(2)
+      this.selectAmout = selectAmout.toFixed(2)
+      this.selEstimatedCost = selEstimatedCost.toFixed(2)
     },
     handleSizeChange (val) {
       this.pagesize = val

@@ -125,7 +125,7 @@ export default {
         amt: '', // 票面金额
         maturityDate: '', // 汇票到期日
         billNo: '', // 票号
-        finance_type: '2', // 融资类型
+        finance_type: '', // 融资类型
         bank_no: '' // 承兑行行号
       },
       ticketId: '', // 票据id
@@ -162,6 +162,7 @@ export default {
             this.dataBilInfo.maturityDate = maturityDate
             this.dataBilInfo.bank_no = res.data.bank_no
             this.originUrl = res.data.bill_url
+            this.finance_type = res.data.finance_type
           }
         })
       } catch (error) {
